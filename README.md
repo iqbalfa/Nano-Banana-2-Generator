@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# 🍌 Nano Banana 2 Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web UI for Google's **Gemini Nano Banana** image generation API. Generate and edit images using Nano Banana 2 (`gemini-3.1-flash-image-preview`) and Nano Banana Pro (`gemini-3-pro-image-preview`).
 
-Currently, two official plugins are available:
+🔥 **Live Demo**: https://iqbalfa.github.io/Nano-Banana-2-Generator/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- 🎨 **Full parameter control** — output format, temperature, aspect ratio, resolution, thinking level
+- 🔍 **Grounding with Google Search** — generate images based on real-time web data
+- 🖼️ **Image Search** — use web images as visual context (Nano Banana 2)
+- 🧠 **Thinking levels** — Minimal, Low, Medium, High
+- 💬 **Chat-style interface** conversational multi-turn image generation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## How to Use
 
-## Expanding the ESLint configuration
+1. **Get a Gemini API key** from [Google AI Studio](https://aistudio.google.com/)
+2. Enter your API key in the sidebar and click **Save**
+3. Adjust parameters as needed
+4. Type a prompt and click Generate (or press Enter)
+5. View the generated images and text response
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Parameters
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| Parameter | Values |
+|-----------|--------|
+| **Model** | Nano Banana 2 / Nano Banana Pro |
+| **Output format** | Images & text / Images only |
+| **Temperature** | 0.0 – 2.0 (default: 1.0) |
+| **Aspect ratio** | Auto, 1:1, 1:4, 1:8, 2:3, 3:2, 3:4, 4:1, 4:3, 4:5, 5:4, 8:1, 9:16, 16:9, 21:9 |
+| **Resolution** | 512, 1K, 2K, 4K |
+| **Thinking level** | Minimal, Low, Medium, High |
+| **Top P** | 0.0 – 1.0 (default: 0.95) |
+| **Output length** | Max output tokens (default: 65536) |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## API Reference
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Built on top of the [Gemini API generateContent](https://ai.google.dev/gemini-api/docs/image-generation) endpoint. Uses the `gemini-3.1-flash-image-preview` and `gemini-3-pro-image-preview` models.
+
+## Tech Stack
+
+- Vite + React + TypeScript
+- Tailwind CSS v4
+- GitHub Pages
+- Gemini API (client-side)
+
+## Development
+
+```bash
+npm install
+npm run dev
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## License
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+MIT

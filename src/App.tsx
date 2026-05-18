@@ -539,7 +539,17 @@ function ToggleOption({ label, description, enabled, onChange, disabled }: {
         onClick={() => !disabled && onChange(!enabled)}
         className={`relative w-9 h-5 rounded-full transition-colors ${enabled ? 'bg-accent' : 'bg-gray-200'} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
       >
-        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${enabled ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
+        <div style={{
+          position: 'absolute',
+          top: '2px',
+          width: '16px',
+          height: '16px',
+          backgroundColor: 'white',
+          borderRadius: '50%',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+          transition: 'transform 0.15s ease',
+          transform: enabled ? 'translateX(18px)' : 'translateX(2px)',
+        }} />
       </button>
     </div>
   )
