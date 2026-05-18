@@ -1,5 +1,11 @@
 import { useState, useCallback, useRef } from 'react'
 
+interface RefImage {
+  name: string
+  data: string  // base64
+  mimeType: string
+}
+
 interface AppState {
   apiKey: string
   model: string
@@ -14,7 +20,7 @@ interface AppState {
   outputLength: number
   topP: number
   prompt: string
-  referenceImages: string[]
+  referenceImages: RefImage[]
 }
 
 type Message = {
@@ -134,6 +140,26 @@ export default function App() {
       e.preventDefault()
       handleGenerate()
     }
+  }
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    const loaded: RefImage[] = []
+    for (const file of files) {
+      const base64 = await fileToBase64(file)
+      loaded.push({ name: file.name, data: base64, mimeType: file.type })
+    }
+
+    updateState({ referenceImages: [...state.referenceImages, ...loaded] })
+    // Reset input so selecting the same file triggers onChange again
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const handleRemoveRefImage = (idx: number) => {
+    const updated = state.referenceImages.filter((_, i) => i !== idx)
+    updateState({ referenceImages: updated })
   }
 
   return (
@@ -485,10 +511,25 @@ export default function App() {
                   accept="image/*"
                   multiple
                   className="hidden"
-                  onChange={() => {
-                    // Reference image upload — coming soon
-                  }}
+                  onChange={handleFileSelect}
                 />
+                {state.referenceImages.length > 0 && (
+                  <div className="absolute bottom-full left-0 right-0 mb-2 flex gap-2 flex-wrap px-1">
+                    {state.referenceImages.map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img
+                          src={img.data}
+                          alt={img.name}
+                          className="w-12 h-12 rounded-lg border border-border object-cover"
+                        />
+                        <button
+                          onClick={() => handleRemoveRefImage(i)}
+                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] leading-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                        >✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <button
                   onClick={handleGenerate}
                   disabled={!state.apiKey || !state.prompt.trim()}
@@ -597,10 +638,23 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
     tools.push(searchTool)
   }
 
+  const parts: Record<string, any>[] = [{ text: state.prompt }]
+
+  // Add reference images as inline_data parts
+  for (const img of state.referenceImages) {
+    const rawData = img.data.replace(/^data:image\/\w+;base64,/, '')
+    parts.push({
+      inlineData: {
+        mimeType: img.mimeType,
+        data: rawData,
+      },
+    })
+  }
+
   const body: Record<string, any> = {
     contents: [
       {
-        parts: [{ text: state.prompt }],
+        parts,
       },
     ],
     generationConfig,
@@ -655,4 +709,13 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
   }
 
   return result
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
 }
