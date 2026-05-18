@@ -623,6 +623,7 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
     topP: state.topP,
     maxOutputTokens: state.outputLength,
     responseModalities: modalities,
+    candidateCount: 1,
   }
 
   if (state.aspectRatio !== 'Auto') {
@@ -705,8 +706,8 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
     let thoughtParts: string[] = []
 
     for (const part of data.candidates[0].content.parts) {
-      // Capture images regardless of text presence
-      if (part.inlineData?.mimeType?.startsWith('image/')) {
+      // Capture images regardless of text presence (max 1)
+      if (part.inlineData?.mimeType?.startsWith('image/') && images.length === 0) {
         images.push(`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`)
       }
       // Capture text, split by thought vs non-thought
