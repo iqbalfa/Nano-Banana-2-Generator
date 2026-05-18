@@ -27,6 +27,7 @@ type Message = {
   id: string
   role: 'user' | 'model'
   text?: string
+  thought?: string
   images?: string[]
   loading?: boolean
   error?: string
@@ -107,6 +108,7 @@ export default function App() {
         id: 'resp-' + Date.now().toString(),
         role: 'model',
         text: result.text || undefined,
+        thought: result.thought || undefined,
         images: result.images,
       }
 
@@ -463,6 +465,12 @@ export default function App() {
                 {msg.error && (
                   <div className="text-red-500 text-[13px] whitespace-pre-wrap">{msg.error}</div>
                 )}
+                {msg.thought && (
+                  <div className="mb-2 p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
+                    <div className="text-[11px] font-medium text-gray-400 mb-1 uppercase tracking-wider">🧠 Thinking</div>
+                    <div className="text-[12px] text-gray-500 italic whitespace-pre-wrap leading-relaxed">{msg.thought}</div>
+                  </div>
+                )}
                 {msg.text && (
                   <div className="text-[13px] whitespace-pre-wrap leading-relaxed">{msg.text}</div>
                 )}
@@ -596,7 +604,7 @@ function ToggleOption({ label, description, enabled, onChange, disabled }: {
   )
 }
 
-async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ text?: string; images?: string[] }> {
+async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ text?: string; thought?: string; images?: string[] }> {
   const apikey = state.apiKey
   const model = state.model
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
@@ -619,6 +627,7 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
   if (state.thinkingLevel) {
     generationConfig.thinkingConfig = {
       thinkingLevel: state.thinkingLevel,
+      includeThoughts: true,
     }
   }
 
@@ -681,14 +690,18 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
 
   const data = await response.json()
   
-  const result: { text?: string; images?: string[] } = {}
+  const result: { text?: string; thought?: string; images?: string[] } = {}
   
   if (data.candidates?.[0]?.content?.parts) {
     const images: string[] = []
     let textParts: string[] = []
+    let thoughtParts: string[] = []
 
     for (const part of data.candidates[0].content.parts) {
-      if (part.text) {
+      if (!part.text) continue
+      if (part.thought) {
+        thoughtParts.push(part.text)
+      } else {
         textParts.push(part.text)
       }
       if (part.inlineData?.mimeType?.startsWith('image/')) {
@@ -697,6 +710,7 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
     }
 
     if (textParts.length > 0) result.text = textParts.join('\n')
+    if (thoughtParts.length > 0) result.thought = thoughtParts.join('\n')
     if (images.length > 0) result.images = images
   }
 
