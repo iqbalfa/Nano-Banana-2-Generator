@@ -698,14 +698,17 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
     let thoughtParts: string[] = []
 
     for (const part of data.candidates[0].content.parts) {
-      if (!part.text) continue
-      if (part.thought) {
-        thoughtParts.push(part.text)
-      } else {
-        textParts.push(part.text)
-      }
+      // Capture images regardless of text presence
       if (part.inlineData?.mimeType?.startsWith('image/')) {
         images.push(`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`)
+      }
+      // Capture text, split by thought vs non-thought
+      if (part.text) {
+        if (part.thought) {
+          thoughtParts.push(part.text)
+        } else {
+          textParts.push(part.text)
+        }
       }
     }
 
