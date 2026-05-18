@@ -485,9 +485,8 @@ export default function App() {
                   accept="image/*"
                   multiple
                   className="hidden"
-                  onChange={e => {
-                    const files = Array.from(e.target.files || [])
-                    // Convert to base64 etc
+                  onChange={() => {
+                    // Reference image upload — coming soon
                   }}
                 />
                 <button
