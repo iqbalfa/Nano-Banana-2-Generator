@@ -492,52 +492,58 @@ export default function App() {
         </div>
 
         {/* Prompt Input */}
-        <div className="border-t border-border bg-white p-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex gap-2 items-end">
-              <div className="flex-1 relative">
-                <textarea
-                  value={state.prompt}
-                  onChange={e => updateState({ prompt: e.target.value })}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Describe the image you want to generate..."
-                  rows={2}
-                  className="w-full px-3 py-2.5 border border-border rounded-xl text-[13px] focus:outline-none focus:border-text-primary resize-none transition-colors"
-                />
-              </div>
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="p-2.5 border border-border rounded-xl hover:bg-surface-hover text-text-secondary transition-colors"
-                  title="Attach reference images"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
-                {state.referenceImages.length > 0 && (
-                  <div className="absolute bottom-full left-0 right-0 mb-2 flex gap-2 flex-wrap px-1">
-                    {state.referenceImages.map((img, i) => (
-                      <div key={i} className="relative group">
-                        <img
-                          src={img.data}
-                          alt={img.name}
-                          className="w-12 h-12 rounded-lg border border-border object-cover"
-                        />
-                        <button
-                          onClick={() => handleRemoveRefImage(i)}
-                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] leading-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                        >✕</button>
-                      </div>
-                    ))}
+        <div className="border-t border-border bg-white">
+          {/* Reference image preview — inline flow, always visible */}
+          {state.referenceImages.length > 0 && (
+            <div className="px-4 pt-3 flex gap-2 flex-wrap border-b border-border-light">
+              {state.referenceImages.map((img, i) => (
+                <div key={i} className="relative group">
+                  <img
+                    src={img.data}
+                    alt={img.name}
+                    className="w-16 h-16 rounded-lg border border-border object-cover"
+                  />
+                  <button
+                    onClick={() => handleRemoveRefImage(i)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-[11px] leading-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-md"
+                    title="Remove"
+                  >✕</button>
+                  <div className="absolute bottom-1 left-1 right-1">
+                    <div className="text-[9px] text-white bg-black/60 rounded px-1 truncate text-center">{img.name}</div>
                   </div>
-                )}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="p-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <textarea
+                    value={state.prompt}
+                    onChange={e => updateState({ prompt: e.target.value })}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Describe the image you want to generate..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 border border-border rounded-xl text-[13px] focus:outline-none focus:border-text-primary resize-none transition-colors"
+                  />
+                </div>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2.5 border border-border rounded-xl hover:bg-surface-hover text-text-secondary transition-colors"
+                    title="Attach reference images"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
                 <button
                   onClick={handleGenerate}
                   disabled={!state.apiKey || !state.prompt.trim()}
@@ -558,6 +564,7 @@ export default function App() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }
