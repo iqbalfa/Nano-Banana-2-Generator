@@ -570,11 +570,8 @@ async function buildRequest(state: AppState, signal: AbortSignal): Promise<{ tex
   }
 
   if (state.aspectRatio !== 'Auto') {
-    generationConfig.responseFormat = {
-      image: {
-        aspectRatio: state.aspectRatio,
-        imageSize: state.resolution,
-      }
+    generationConfig.imageConfig = {
+      aspectRatio: state.aspectRatio,
     }
   }
 
